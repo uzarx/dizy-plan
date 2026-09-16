@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dizy Plan — lokal plan editor</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/" aria-label="Dizy Plan"
+        ><span class="brand-icon">d<span>·</span></span
+        ><strong>dizy<span>plan</span></strong></a
+      ><span class="divider"></span
+      ><span class="workspace-label">Sizning chizma ustaxonangiz</span
+      ><span class="local"><i></i> Local workspace</span
+      ><button id="open-btn" class="button">↗ <span>Fayl ochish</span></button
+      ><button id="save-btn" class="button">Loyihani saqlash</button
+      ><button id="handoff-btn" class="button primary">
+        Vazifa paketi <span>↗</span>
+      </button>
+    </header>
+    <div class="app">
+      <aside class="left-panel">
+        <div class="section-heading">LOYIHA <span>01</span></div>
+        <div class="project-card">
+          <span class="file-icon">▱</span>
+          <div>
+            <strong id="project-name">Plan tanlang</strong
+            ><small id="save-state">Kompyuteringizda ishlaydi</small>
+          </div>
+        </div>
+        <label class="field-label" for="plan-picker">Namuna plan</label
+        ><select id="plan-picker">
+          <option value="">Plan tanlash…</option></select
+        ><button id="fit-plan" class="wide-button">
+          ⌗ &nbsp; Planni to‘liq ko‘rsatish <kbd>F</kbd>
+        </button>
+        <div class="panel-divider"></div>
+        <div class="section-heading">
+          QATLAMLAR <span id="layer-count">0</span>
+        </div>
+        <p class="muted small">Ko‘z belgisini bosib yashiring.</p>
+        <div id="layers" class="layers"></div>
+        <div class="left-footer">
+          <div class="tiny-logo">✳</div>
+          <strong>Fikrdan yangi plangacha.</strong>
+          <p>
+            Obyektni suring, izoh qoldiring.<br />Qolganini birga davom
+            ettiramiz.
+          </p>
+          <button id="help-btn" class="text-button">
+            Qanday ishlaydi? <span>↗</span>
+          </button>
+        </div>
+      </aside>
+      <main class="workspace">
+        <div class="canvas-header">
+          <div>
+            <span class="live-dot"></span><strong>Plan muharriri</strong
+            ><span class="tag">2D</span>
+          </div>
+          <div class="history">
+            <button
+              id="undo-btn"
+              title="Bekor qilish · ⌘Z"
+              aria-label="Bekor qilish"
+            >
+              ↶</button
+            ><button
+              id="redo-btn"
+              title="Qaytarish · ⌘⇧Z"
+              aria-label="Qaytarish"
+            >
+              ↷</button
+            ><span></span><button id="export-btn">Eksport ↓</button>
+          </div>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas
+            id="canvas"
+            tabindex="0"
+            aria-label="Interaktiv plan chizmasi"
+          ></canvas>
+          <nav class="tools" aria-label="Chizish vositalari">
+            <button
+              data-tool="select"
+              class="active"
+              title="Tanlash va surish · V"
+              aria-label="Tanlash"
+            >
+              <svg viewBox="0 0 24 24"><path d="m5 3 14 9-7 1-3 7Z" /></svg
+              ><kbd>V</kbd>
+            </button>
+            <button
+              data-tool="pan"
+              title="Ko‘rinishni surish · H / Space"
+              aria-label="Ko‘rinishni surish"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8q0 6-6 6H11q-3 0-5-4l-3-4q-1-3 2-2l3 3"
+                /></svg
+              ><kbd>H</kbd>
+            </button>
+            <hr />
+            <button data-tool="line" title="Chiziq · L" aria-label="Chiziq">
+              <svg viewBox="0 0 24 24">
+                <path d="m5 19 14-14" />
+                <circle cx="5" cy="19" r="2" />
+                <circle cx="19" cy="5" r="2" /></svg
+              ><kbd>L</kbd>
+            </button>
+            <button
+              data-tool="rect"
+              title="To‘rtburchak · R"
+              aria-label="To‘rtburchak"
+            >
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="5" width="16" height="14" rx="1" /></svg
+              ><kbd>R</kbd>
+            </button>
+            <button
+              data-tool="measure"
+              title="Masofani o‘lchash · M"
+              aria-label="O‘lchash"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="m3 15 12-12 6 6-12 12ZM10 8l3 3m1-7 3 3M6 12l3 3"
+                /></svg
+              ><kbd>M</kbd>
+            </button>
+            <hr />
+            <button data-tool="note" title="Izoh qo‘yish · N" aria-label="Izoh">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M20 15a3 3 0 0 1-3 3H9l-5 4V6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3Z"
+                />
+                <path d="M8 8h8M8 12h5" /></svg
+              ><kbd>N</kbd>
+            </button>
+          </nav>
+          <div class="canvas-label">
+            <span>MODEL SPACE</span
+            ><small id="canvas-subtitle">Haqiqiy o‘lchamda · millimetr</small>
+          </div>
+          <div class="view-controls">
+            <button id="zoom-out" aria-label="Kichraytirish">−</button
+            ><span id="zoom-value">100%</span
+            ><button id="zoom-in" aria-label="Kattalashtirish">+</button
+            ><span class="control-divider"></span
+            ><button
+              id="fit-btn"
+              title="Planni sig‘dirish"
+              aria-label="Planni sig‘dirish"
+            >
+              ⛶
+            </button>
+          </div>
+          <div id="empty" class="empty">
+            <div class="empty-icon">⌑</div>
+            <h1>Keyingi yaxshi plan<br />shu yerdan boshlanadi.</h1>
+            <p>
+              Chapdan namuna planni tanlang<br />yoki DWG / DXF faylingizni
+              oching.
+            </p>
+            <button id="empty-open" class="button primary">
+              Fayl ochish ↗
+            </button>
+          </div>
+          <div id="busy" class="busy" hidden>
+            <span class="spinner"></span
+            ><strong id="busy-text">Plan ochilmoqda…</strong>
+          </div>
+        </div>
+        <footer class="statusbar">
+          <span id="tool-hint">Obyektni tanlang va suring</span
+          ><span id="coordinates">X 0 &nbsp; Y 0</span
+          ><button id="snap-btn" class="active">⌗ Snap: 50</button
+          ><span id="units">mm</span>
+        </footer>
+      </main>
+      <aside class="right-panel">
+        <div class="right-tabs">
+          <button class="active" data-tab="properties">Xususiyatlar</button
+          ><button data-tab="notes">
+            Izohlar <span id="note-count">0</span>
+          </button>
+        </div>
+        <section id="properties-panel">
+          <div id="selection-empty" class="selection-empty">
+            <div class="selection-symbol">⌖</div>
+            <strong>Biror obyektni tanlang</strong>
+            <p>
+              Mebel yoki chiziqni bosing.<br />So‘ng suring yoki aylantiring.
+            </p>
+          </div>
+          <div id="selection-details" hidden>
+            <div class="section-heading">TANLANGAN OBYEKT</div>
+            <h3 id="selection-title"></h3>
+            <p class="muted small" id="selection-layer"></p>
+            <div id="transform-fields">
+              <div class="input-grid">
+                <label
+                  >X siljish <input id="dx" type="number" step="50" /></label
+                ><label
+                  >Y siljish <input id="dy" type="number" step="50"
+                /></label>
+              </div>
+              <label class="rotation-label"
+                >Burilish, °
+                <input id="rotation" type="number" step="15" /></label
+              ><button id="apply-transform" class="button full">
+                Qiymatlarni qo‘llash</button
+              ><button id="rotate-btn" class="wide-button">
+                ↻ &nbsp; 90° aylantirish
+              </button>
+            </div>
+            <button id="delete-btn" class="wide-button danger">
+              ⌫ &nbsp; Obyektni o‘chirish
+            </button>
+          </div>
+          <div class="panel-divider"></div>
+          <div class="section-heading">CHIZMA SOZLAMALARI</div>
+          <label class="switch-row"
+            ><span>To‘rni ko‘rsatish</span
+            ><input type="checkbox" id="grid-toggle" checked /></label
+          ><label class="switch-row"
+            ><span>To‘rga yopishish</span
+            ><input type="checkbox" id="snap-toggle" checked /></label
+          ><label class="field-label" for="grid-size"
+            >To‘r qadami <span id="grid-unit">mm</span></label
+          ><select id="grid-size">
+            <option value="10">10</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="500">500</option>
+          </select>
+          <div class="tip">
+            <span>↖</span>
+            <p>
+              <strong>Kichik yordam</strong><br />Scroll — yaqinlashtirish.<br />Space
+              + surish — ko‘rinishni surish.<br />Shift — to‘g‘ri chiziq.
+            </p>
+          </div>
+        </section>
+        <section id="notes-panel" hidden>
+          <div class="notes-intro">
+            <h3>Fikringizni planga qo‘ying.</h3>
+            <p>Izoh vositasini tanlab, plandagi kerakli joyni bosing.</p>
+            <button id="add-note" class="button full">＋ Izoh qo‘shish</button>
+          </div>
+          <div id="notes-list"></div>
+          <label class="field-label" for="brief"
+            >Codex uchun umumiy vazifa</label
+          ><textarea
+            id="brief"
+            rows="5"
+            placeholder="Masalan: oshxonani kattalashtir, stolni deraza yoniga qo‘y…"
+          ></textarea>
+          <p class="muted small">
+            Vazifa paketi tugmasi plan, izoh va topshiriqni bitta ZIP faylga
+            yig‘adi.
+          </p>
+        </section>
+        <div class="right-footer">
+          <span class="live-dot"></span
+          ><span id="dwg-status">Local · internet talab qilinmaydi</span>
+        </div>
+      </aside>
+    </div>
+    <input id="file-input" type="file" accept=".dwg,.dxf,.json" hidden />
+    <dialog id="note-dialog">
+      <form method="dialog" id="note-form">
+        <div class="dialog-eyebrow">PLANGA IZOH</div>
+        <h2>Nimani o‘zgartiramiz?</h2>
+        <p>Vazifani shu joyga biriktiring.</p>
+        <textarea
+          id="note-text"
+          rows="5"
+          placeholder="Masalan: bu divanni 300 mm o‘ngga surish kerak."
+          required
+        ></textarea>
+        <div class="dialog-actions">
+          <button type="button" class="button" id="note-cancel">
+            Bekor qilish</button
+          ><button class="button primary" type="submit">
+            Izohni saqlash ↗
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="export-dialog">
+      <div class="dialog-eyebrow">CHIZMANI OLISH</div>
+      <h2>Qaysi format kerak?</h2>
+      <p>Asl faylingiz o‘zgarmaydi. Yangi nusxa saqlanadi.</p>
+      <button class="export-option" data-format="dwg">
+        <b>DWG</b
+        ><span
+          >AutoCAD chizmasi<small id="dwg-option-label"
+            >Lokal ODA konverter orqali</small
+          ></span
+        ><span>↗</span></button
+      ><button class="export-option" data-format="dxf">
+        <b>DXF</b
+        ><span
+          >CAD dasturlari uchun<small>Obyekt va bloklar saqlanadi</small></span
+        ><span>↗</span></button
+      ><button class="export-option" data-format="svg">
+        <b>SVG</b
+        ><span>Plan ko‘rinishi<small>Rasm sifatida ko‘rish uchun</small></span
+        ><span>↗</span>
+      </button>
+      <div class="dialog-actions">
+        <button class="button" id="export-close">Yopish</button>
+      </div>
+    </dialog>
+    <dialog id="help-dialog">
+      <div class="dialog-eyebrow">DIZY PLAN · BIRINCHI QADAMLAR</div>
+      <h2>Plan. Izoh. Yangi vazifa.</h2>
+      <ol>
+        <li>
+          <strong>Plan oching.</strong> Namuna planni tanlang yoki DWG/DXF fayl
+          yuklang.
+        </li>
+        <li>
+          <strong>Tahrirlang.</strong> Mebelni suring, 90° aylantiring, chiziq
+          yoki to‘rtburchak chizing.
+        </li>
+        <li>
+          <strong>Fikringizni yozing.</strong> N tugmasini bosib, kerakli joyga
+          izoh qo‘ying.
+        </li>
+        <li>
+          <strong>Vazifa paketi oling.</strong> ZIP faylni Codex suhbatiga
+          qo‘shib, vazifa bering.
+        </li>
+      </ol>
+      <p class="muted">
+        Bu boshlang‘ich 2D editor. Blok ichidagi qismlar birga tanlanadi.
+        Murakkab CAD obyektlari ko‘rinishda soddalashtirilishi mumkin; asl
+        yozuvlari eksportda saqlanadi. O‘lchash vositasi vaqtinchalik masofani
+        ko‘rsatadi.
+      </p>
+      <div class="dialog-actions">
+        <button class="button primary" id="help-close">Boshlaymiz ↗</button>
+      </div>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
