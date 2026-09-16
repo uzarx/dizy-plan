@@ -1,0 +1,13 @@
+{
+  "name": "dizy-plan",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local browser-based 2D floor-plan editor",
+  "scripts": {
+    "test": "node tests/browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2",
+    "prettier": "^3.6.2"
+  }
+}
